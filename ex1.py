@@ -33,7 +33,7 @@ imgRGB = np.array(imgRGB)
 
 for i in range(img.shape[0]):
     for j in range(img.shape[1]):
-        if img[i, j] < 25:
+        if img[i, j] < 20:
             imgRGB[i, j] = BLACK
         elif img[i, j] < 40:
             imgRGB[i, j] = ABSOLUTE_ZERO
@@ -46,9 +46,10 @@ for i in range(img.shape[0]):
         elif img[i, j] < 120:
             imgRGB[i, j] = AMBER
         elif img[i, j] < 140:
+            imgRGB[i, j] = GREEN
+        elif img[i, j] < 155:
             imgRGB[i, j] = RED
         else:
             imgRGB[i, j] = WHITE
-
 g = [img, imgRGB]
 ml.show_images(g)
