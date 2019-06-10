@@ -9,9 +9,18 @@
 from PIL import Image
 import numpy as np
 
-
-img = Image.open('images/estrada.png')              # Le a imagem
-img.convert('RGB')
+img = Image.open('images/peppers.tiff')             # Le a imagem
 img = np.array(img)                                 # Converte a imagem para um numpy array
 
-print(img[0,0])
+chR = img[:, :, 0]
+chG = img[:, :, 1]
+chB = img[:, :, 2]
+
+index = chR > (chG + 20)
+index2 = chR > (chB + 20)
+
+x = index & index2
+print(x)
+chR[x], chB[x] = chB[x], chR[x]
+
+Image.fromarray(img).show()
