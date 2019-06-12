@@ -8,9 +8,9 @@
 
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 import MyLib as ml
-
+from copy import deepcopy
 
 def findPoints(img, value=255):
     shape = img.shape
@@ -18,7 +18,7 @@ def findPoints(img, value=255):
     for i in range(0, shape[0]):
         for j in range(0, shape[1]):
             if img[i, j] == value:
-                points.append((i, j))
+                points.append((j, i))
 
     return points
 
@@ -44,18 +44,19 @@ def distPoint2Line(lineEquation, point):
 
 
 def sortPoints(points):
-    a = points.pop(0)
+    a = min(points)
+    points.remove(a)
     sorted = []
     sorted.append(a)
 
     for i in range(len(points)):
-        min = 1000000000000
+        minDist = 1000000000000
         idx = -1
         for idx, (x, y) in enumerate(points):
             xp, yp = sorted[i]
             d = np.sqrt((xp - x)**2 + (yp - y)**2)
-            if d < min:
-                min = d
+            if d < minDist:
+                minDist = d
                 index = idx
 
         if index != -1:
@@ -72,7 +73,7 @@ def sortPoints(points):
 # for item in pool:
 #     print item,
 
-def connectPoints(sortedPoints, threshold=20, closed=True):
+def connectPoints(sortedPoints, img, threshold=25, closed=True):
     # 1. Digamos que P seja uma sequência de pontos ordenados, distintos, de valor 1 em uma imagem
     # binária. Especificamos dois pontos de partida, A e B. Estes são os dois vértices iniciais do polígono.
     # 2.Estabelecemos um limiar, T, e duas pilhas vazias, ABERTA e FECHADA.
@@ -80,7 +81,7 @@ def connectPoints(sortedPoints, threshold=20, closed=True):
     openStack = []
     closeStack = []
 
-    initialA, initialB = 0, 20
+    initialA, initialB = 0, 17
 
     a = sortedPoints[initialA]
     b = sortedPoints[initialB]
@@ -99,47 +100,79 @@ def connectPoints(sortedPoints, threshold=20, closed=True):
     while len(openStack) > 0:
         # 4. Calculamos os parâmetros da reta que passa pelo último vértice em FECHADA e pelo último vértice
         # em ABERTA.
+        loPoint = openStack[-1]
         eq = getLineEquation(lcPoint, loPoint)
+        # copy = deepcopy(img)
+        # draw = ImageDraw.Draw(copy)
+        # print("LCpoint {} LOpoint {}".format(lcPoint, loPoint))
+        # draw.line([lcPoint, loPoint], fill=255, width=5)
+        # copy.show()
+        # input()
         lcIndex = sortedPoints.index(lcPoint)
         loIndex = sortedPoints.index(loPoint)
 
         distMax = 0
         idxMax = 0
-        for i in range(loIndex, lcIndex):
+
+        if loIndex > lcIndex:
+            sublist = sortedPoints[loIndex:]
+        else:
+            sublist = sortedPoints[loIndex:lcIndex]
+
+        for point in sublist:
             # 5. Calculamos as distâncias em relação a reta calculada na Etapa 4 para todos os pontos em P cuja
             # sequência os coloca entre os vértices da Etapa 4. Selecionamos o ponto, V máx , com a distância máxima,
             # D máx (os empates são resolvidos arbitrariamente).
-            distance = distPoint2Line(eq, sortedPoints[i])
+            distance = distPoint2Line(eq, point)
 
             if distance > distMax:
                 distMax = distance                        # getting max value
-                idxMax = i
+                idxMax = sortedPoints.index(point)
 
         if distMax > threshold:
             # 6. Se D máx > T, pomos V máx no final da pilha ABERTA
             # como um novo vértice. Vá para a Etapa 4.
             openStack.append(sortedPoints[idxMax])
-            loIndex = sortedPoints.index(openStack[-1])
-            loPoint = openStack[-1]
         else:
             # 7. Se não, remova o último vértice de ABERTA e o
             # insira como o último vértice de FECHADA.
             closeStack.append(openStack.pop())
-            lcIndex = sortedPoints.index(closeStack[-1])
+            lcPoint = closeStack[-1]
 
         # 8. Se ABERTA não estiver vazia, vamos para a Etapa 4.
         # 9. Caso contrário, saímos. Os vértices em FECHADA são os vértices do ajuste poligonal dos pontos pertencentes a P.
         print("ABERTA:")
-        print(openStack)
+        p = []
+        for i in openStack:
+            p.append(sortedPoints.index(i))
+        print(p)
+        p = []
         print("FECHADA:")
-        print(closeStack)
+        for i in closeStack:
+            p.append(sortedPoints.index(i))
+        print(p)
+        print(eq)
+        print("")
     return closeStack
 
 
 img = Image.open('images/pontos.bmp')
 img = np.array(img)
 
+
 points = findPoints(img, 255)
 sorted = sortPoints(points)
-f = connectPoints(sorted)
+
+# img = Image.fromarray(img)
+
+f = connectPoints(sorted, img)
+
+# ml.show_images([img])
+img = Image.fromarray(img)
+draw = ImageDraw.Draw(img)
+fnt = ImageFont.truetype('Pillow/Tests/fonts/FreeMono.ttf', 20)
+draw.line(f, fill=255, width=1)
+for i, p in enumerate(sorted):
+    draw.text(p, str(i), font=fnt, fill=(255))
+img.show()
 # print(f)
