@@ -10,7 +10,6 @@
 import numpy as np
 from PIL import Image
 import MyLib as ml
-import matplotlib.pyplot as plt
 
 
 def findPoints(img, value=255):
@@ -73,58 +72,68 @@ def sortPoints(points):
 # for item in pool:
 #     print item,
 
-def ligaPontos(pontos, limiar=20, closed=True):
+def connectPoints(sortedPoints, threshold=20, closed=True):
     # 1. Digamos que P seja uma sequência de pontos ordenados, distintos, de valor 1 em uma imagem
     # binária. Especificamos dois pontos de partida, A e B. Estes são os dois vértices iniciais do polígono.
     # 2.Estabelecemos um limiar, T, e duas pilhas vazias, ABERTA e FECHADA.
 
-    aberta = []
-    fechada = []
+    openStack = []
+    closeStack = []
 
-    startA, startB = 0, 20
+    initialA, initialB = 0, 20
 
-    a = pontos[startA]
-    b = pontos[startB]
+    a = sortedPoints[initialA]
+    b = sortedPoints[initialB]
     # 3. Se os pontos em P correspondem a uma curva fechada, colocamos A em ABERTA e B em ABERTA e
     # em FECHADA. Se os pontos correspondem a uma curva aberta, colocamos A em ABERTA e B em FECHADA.
 
     if closed:
-        aberta.append(b)
+        openStack.append(b)
 
-    aberta.append(a)
-    fechada.append(b)
+    openStack.append(a)
+    closeStack.append(b)
 
-    while len(aberta) > 0:
+    lcPoint = closeStack[-1]   # close stack last point
+    loPoint = openStack[-1]    # open stack last point
+
+    while len(openStack) > 0:
         # 4. Calculamos os parâmetros da reta que passa pelo último vértice em FECHADA e pelo último vértice
         # em ABERTA.
-        p1 = fechada[-1]
-        p2 = aberta[-1]
-        eq = getLineEquation(p1, p2)
-        distances = []
+        eq = getLineEquation(lcPoint, loPoint)
+        lcIndex = sortedPoints.index(lcPoint)
+        loIndex = sortedPoints.index(loPoint)
 
-        for i in range(pontos.index(p1)):
+        distMax = 0
+        idxMax = 0
+        for i in range(loIndex, lcIndex):
             # 5. Calculamos as distâncias em relação a reta calculada na Etapa 4 para todos os pontos em P cuja
             # sequência os coloca entre os vértices da Etapa 4. Selecionamos o ponto, V máx , com a distância máxima,
             # D máx (os empates são resolvidos arbitrariamente).
-            distances.append(distPoint2Line(eq, pontos[i]))
+            distance = distPoint2Line(eq, sortedPoints[i])
 
-        if len(distances) > 0:
-            distMax = max(distances)    # getting max value
-            idxMax = distances.index(distMax)
+            if distance > distMax:
+                distMax = distance                        # getting max value
+                idxMax = i
 
-            if distMax > limiar:
-                # 6. Se D máx > T, pomos V máx no final da pilha ABERTA
-                # como um novo vértice. Vá para a Etapa 4.
-                aberta.append(pontos[idxMax])
-            else:
-                # 7. Se não, remova o último vértice de ABERTA e o
-                # insira como o último vértice de FECHADA.
-                fechada.append(aberta.pop())
+        if distMax > threshold:
+            # 6. Se D máx > T, pomos V máx no final da pilha ABERTA
+            # como um novo vértice. Vá para a Etapa 4.
+            openStack.append(sortedPoints[idxMax])
+            loIndex = sortedPoints.index(openStack[-1])
+            loPoint = openStack[-1]
+        else:
+            # 7. Se não, remova o último vértice de ABERTA e o
+            # insira como o último vértice de FECHADA.
+            closeStack.append(openStack.pop())
+            lcIndex = sortedPoints.index(closeStack[-1])
 
         # 8. Se ABERTA não estiver vazia, vamos para a Etapa 4.
         # 9. Caso contrário, saímos. Os vértices em FECHADA são os vértices do ajuste poligonal dos pontos pertencentes a P.
-        print(len(fechada))
-    return fechada
+        print("ABERTA:")
+        print(openStack)
+        print("FECHADA:")
+        print(closeStack)
+    return closeStack
 
 
 img = Image.open('images/pontos.bmp')
@@ -132,5 +141,5 @@ img = np.array(img)
 
 points = findPoints(img, 255)
 sorted = sortPoints(points)
-f = ligaPontos(sorted)
-print(f)
+f = connectPoints(sorted)
+# print(f)
