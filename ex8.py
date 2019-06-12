@@ -100,10 +100,11 @@ rotatedImage = imgOriginal.rotate(90)
 rotatedImage = np.array(rotatedImage)
 # d) rotacionada de 180º
 flipImage = imgOriginal.rotate(180)
+# flipImage = imgOriginal.transpose(Image.FLIP_LEFT_RIGHT)
 flipImage = np.array(flipImage)
 # print(imgOriginal.size)
 g = [img, resizedImage, rotatedImage, flipImage]
-# print(getInvariantMoments(img))
+ml.show_images(g)
 print("Original: {}".format(getInvariantMoments(img)))
 print("Resized: {}".format(getInvariantMoments(resizedImage)))
 print("Rotated: {}".format(getInvariantMoments(rotatedImage)))
