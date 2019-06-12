@@ -73,7 +73,7 @@ def sortPoints(points):
 # for item in pool:
 #     print item,
 
-def connectPoints(sortedPoints, img, threshold=25, closed=True):
+def connectPoints(sortedPoints, img, threshold=1, closed=True):
     # 1. Digamos que P seja uma sequência de pontos ordenados, distintos, de valor 1 em uma imagem
     # binária. Especificamos dois pontos de partida, A e B. Estes são os dois vértices iniciais do polígono.
     # 2.Estabelecemos um limiar, T, e duas pilhas vazias, ABERTA e FECHADA.
@@ -141,18 +141,20 @@ def connectPoints(sortedPoints, img, threshold=25, closed=True):
 
         # 8. Se ABERTA não estiver vazia, vamos para a Etapa 4.
         # 9. Caso contrário, saímos. Os vértices em FECHADA são os vértices do ajuste poligonal dos pontos pertencentes a P.
-        print("ABERTA:")
-        p = []
-        for i in openStack:
-            p.append(sortedPoints.index(i))
-        print(p)
-        p = []
-        print("FECHADA:")
-        for i in closeStack:
-            p.append(sortedPoints.index(i))
-        print(p)
-        print(eq)
-        print("")
+
+        # print("ABERTA:")
+        # p = []
+        # for i in openStack:
+        #     p.append(sortedPoints.index(i))
+        # print(p)
+        # p = []
+        # print("FECHADA:")
+        # for i in closeStack:
+        #     p.append(sortedPoints.index(i))
+        # print(p)
+        # print(eq)
+        # print("")
+
     return closeStack
 
 
@@ -167,12 +169,12 @@ sorted = sortPoints(points)
 
 f = connectPoints(sorted, img)
 
-# ml.show_images([img])
 img = Image.fromarray(img)
 draw = ImageDraw.Draw(img)
-fnt = ImageFont.truetype('Pillow/Tests/fonts/FreeMono.ttf', 20)
+fnt = ImageFont.truetype('Pillow/Tests/fonts/FreeMono.ttf', 15)
 draw.line(f, fill=255, width=1)
 for i, p in enumerate(sorted):
     draw.text(p, str(i), font=fnt, fill=(255))
-img.show()
-# print(f)
+img = np.array(img)
+ml.show_images([img])
+ # print(f)
