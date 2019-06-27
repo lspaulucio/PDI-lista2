@@ -13,7 +13,6 @@ import MyLib as ml
 from copy import deepcopy
 
 E3 = np.ones((3, 3))
-E7 = np.ones((7, 7))
 
 
 def erosao(img, elem):
@@ -69,7 +68,6 @@ def esqueleto(img, elem):
     i, k = 0, 0
     s.append(imgCopy)
 
-    # OLHAR LOOP
     while(True):
         imgCopy = erosao(imgCopy, elem)
         if np.count_nonzero(imgCopy) == 0:
@@ -95,19 +93,5 @@ skeleton = esqueleto(img, E3)
 
 r = img - skeleton
 g = [img, skeleton, r]
-ml.show_images(g)
-
-
-# imgBorder = ml.conv2D(img, ml.LAPLACE_FILTER)
-#
-# borders = [(i, j) for i in range(0, imgBorder.shape[0]) for j in range(0, imgBorder.shape[1]) if imgBorder[i, j] == 255]
-#
-# windows = [getWindow(img, i, j) for i, j in borders]
-# N = [np.count_nonzero(window) for window in windows]
-# N = np.array(N)
-# idx = N <= 6
-# idx1 = N >= 2
-# idx = idx & idx1
-# G = N[idx]
-# print(N)
-# Image.fromarray(img).show()
+title = ['Imagem Original', 'Esqueleto da Imagem', 'Resultado Final']
+ml.show_images(g, 1, title)
