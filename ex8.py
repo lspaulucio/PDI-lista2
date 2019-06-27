@@ -87,6 +87,18 @@ def getInvariantMoments(img):
     return invariantMoments
 
 
+def printInvariantMoments(invMoments):
+    for i, moment in enumerate(invMoments):
+        n = 0
+        if moment < 0:
+            n = -np.abs(np.log10(np.abs(moment)))
+        else:
+            n = np.abs(np.log10(np.abs(moment)))
+
+        print("Momento Invariante {} : {}".format(i+1, round(n, 4)))
+
+    print("\n")
+
 # a) imagem normal;
 imgOriginal = Image.open('images/lena.tif')
 img = np.array(imgOriginal)
@@ -95,17 +107,35 @@ img = np.array(imgOriginal)
 newSize = imgOriginal.size[0]//2, imgOriginal.size[1]//2
 resizedImage = imgOriginal.resize(newSize)
 resizedImage = np.array(resizedImage)
+resizedImage = ml.paddingImage(resizedImage, padding_size=128)
+
 # c) rotacionada de 90º;
-rotatedImage = imgOriginal.rotate(90)
-rotatedImage = np.array(rotatedImage)
+rotated90 = imgOriginal.rotate(90)
+rotated90 = np.array(rotated90)
+
 # d) rotacionada de 180º
-flipImage = imgOriginal.rotate(180)
+rotated180 = imgOriginal.rotate(180)
+rotated180 = np.array(rotated180)
 # flipImage = imgOriginal.transpose(Image.FLIP_LEFT_RIGHT)
-flipImage = np.array(flipImage)
-# print(imgOriginal.size)
-g = [img, resizedImage, rotatedImage, flipImage]
-ml.show_images(g)
-print("Original: {}".format(getInvariantMoments(img)))
-print("Resized: {}".format(getInvariantMoments(resizedImage)))
-print("Rotated: {}".format(getInvariantMoments(rotatedImage)))
-print("Flip: {}".format(getInvariantMoments(flipImage)))
+# flipImage = np.array(flipImage)
+
+titles = ['Imagem Original', 'Imagem Redimensionada 0.5', 'Imagem Rotacionada 90º', 'Imagem Rotacionada 180º']
+g = [img, resizedImage, rotated90, rotated180]
+
+# Calculating invariant moments
+img = getInvariantMoments(img)
+resizedImage = getInvariantMoments(resizedImage)
+rotated90 = getInvariantMoments(rotated90)
+rotated180 = getInvariantMoments(rotated180)
+
+print("Imagem Original")
+printInvariantMoments(img)
+print("Imagem Redimensionada 0.5")
+printInvariantMoments(resizedImage)
+print("Imagem Rotacionada 90º")
+printInvariantMoments(rotated90)
+print("Imagem Rotacionada 180º")
+printInvariantMoments(rotated180)
+
+
+ml.show_images(g, 2, titles)
