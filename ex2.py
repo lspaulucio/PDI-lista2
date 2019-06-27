@@ -18,10 +18,13 @@ chR = img[:, :, 0]
 chG = img[:, :, 1]
 chB = img[:, :, 2]
 
-index = chR > (chG + 20)
-index2 = chR > (chB + 20)
+THRESHOLD = 20
+index = chR > (chG + THRESHOLD)    # Finding regions where red color is bigger than green color by 20
+index2 = chR > (chB + THRESHOLD)   # Finding regions where red color is bigger than blue color by 20
 
 x = index & index2
-chR[x], chB[x] = chB[x], chR[x]
+chR[x], chB[x] = chB[x], chR[x]  # Changing masks
+
 g = [orig, img]
-ml.show_images(g)
+title = ['Imagem Original', 'Resultado Obtido']
+ml.show_images(g, 1, title)

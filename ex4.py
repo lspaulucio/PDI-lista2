@@ -12,6 +12,7 @@ from PIL import Image, ImageDraw, ImageFont
 import MyLib as ml
 from copy import deepcopy
 
+
 def findPoints(img, value=255):
     shape = img.shape
     points = []
@@ -67,12 +68,6 @@ def sortPoints(points):
     return sorted
 
 
-# from itertools import cycle
-# lst = ['a', 'b', 'c']
-# pool = cycle(lst)
-# for item in pool:
-#     print item,
-
 def connectPoints(sortedPoints, img, threshold=1, closed=True):
     # 1. Digamos que P seja uma sequência de pontos ordenados, distintos, de valor 1 em uma imagem
     # binária. Especificamos dois pontos de partida, A e B. Estes são os dois vértices iniciais do polígono.
@@ -102,12 +97,7 @@ def connectPoints(sortedPoints, img, threshold=1, closed=True):
         # em ABERTA.
         loPoint = openStack[-1]
         eq = getLineEquation(lcPoint, loPoint)
-        # copy = deepcopy(img)
-        # draw = ImageDraw.Draw(copy)
-        # print("LCpoint {} LOpoint {}".format(lcPoint, loPoint))
-        # draw.line([lcPoint, loPoint], fill=255, width=5)
-        # copy.show()
-        # input()
+
         lcIndex = sortedPoints.index(lcPoint)
         loIndex = sortedPoints.index(loPoint)
 
@@ -142,39 +132,32 @@ def connectPoints(sortedPoints, img, threshold=1, closed=True):
         # 8. Se ABERTA não estiver vazia, vamos para a Etapa 4.
         # 9. Caso contrário, saímos. Os vértices em FECHADA são os vértices do ajuste poligonal dos pontos pertencentes a P.
 
-        # print("ABERTA:")
-        # p = []
-        # for i in openStack:
-        #     p.append(sortedPoints.index(i))
-        # print(p)
-        # p = []
-        # print("FECHADA:")
-        # for i in closeStack:
-        #     p.append(sortedPoints.index(i))
-        # print(p)
-        # print(eq)
-        # print("")
-
     return closeStack
 
 
-img = Image.open('images/pontos.bmp')
-img = np.array(img)
+imgOrig = Image.open('images/pontos.bmp')
+imgOrig = np.array(imgOrig)
 
 
-points = findPoints(img, 255)
+points = findPoints(imgOrig, 255)
 sorted = sortPoints(points)
+images = [imgOrig]
+title = ['Imagen Original']
 
-# img = Image.fromarray(img)
-
-f = connectPoints(sorted, img)
-
-img = Image.fromarray(img)
-draw = ImageDraw.Draw(img)
 fnt = ImageFont.truetype('Pillow/Tests/fonts/FreeMono.ttf', 15)
-draw.line(f, fill=255, width=1)
-for i, p in enumerate(sorted):
-    draw.text(p, str(i), font=fnt, fill=(255))
-img = np.array(img)
-ml.show_images([img])
- # print(f)
+
+for i in [1, 20, 50, 100, 300]:
+    img = Image.fromarray(deepcopy(imgOrig))
+    f = connectPoints(sorted, img, threshold=i)
+    title.append('Resultado com Threshold = {}'.format(i))
+
+    draw = ImageDraw.Draw(img)
+    draw.line(f, fill=255, width=1)
+
+    for i, p in enumerate(sorted):
+        draw.text(p, str(i), font=fnt, fill=(255))
+
+    img = np.array(img)
+    images.append(img)
+
+ml.show_images(images, 3, title)

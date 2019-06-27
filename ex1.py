@@ -12,6 +12,8 @@ from PIL import Image
 import MyLib as ml
 import matplotlib.pyplot as plt
 
+
+# Color definitions
 ABSOLUTE_ZERO = np.array([[0, 72, 186]])
 AMARANTH_PINK = np.array([[241, 156, 187]])
 BLUE = np.array([[0, 0, 255]])
@@ -26,14 +28,18 @@ BLACK = np.array([[0, 0, 0]])
 img = Image.open('images/Thyroid.jpg')
 img = img.convert('L')
 img = np.array(img)
+
 histograma = ml.calculaHistograma(img)
+plt.title('Histograma')
+plt.bar(histograma[0], histograma[1])
 
 imgRGB = Image.fromarray(img).convert('RGB')
 imgRGB = np.array(imgRGB)
 
+# Creating colored regions
 for i in range(img.shape[0]):
     for j in range(img.shape[1]):
-        if img[i, j] < 20:
+        if img[i, j] < 25:
             imgRGB[i, j] = BLACK
         elif img[i, j] < 40:
             imgRGB[i, j] = ABSOLUTE_ZERO
@@ -51,5 +57,7 @@ for i in range(img.shape[0]):
             imgRGB[i, j] = RED
         else:
             imgRGB[i, j] = WHITE
+
+title = ['Imagem Original', 'Resultado']
 g = [img, imgRGB]
-ml.show_images(g)
+ml.show_images(g, 1, title)
