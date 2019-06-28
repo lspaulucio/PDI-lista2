@@ -21,9 +21,8 @@ Image.fromarray(border).show()
 vertices = [(i, j) for i in range(img.shape[0]) for j in range(img.shape[1]) if border[i, j] == 255]
 vertices = np.array(vertices)
 
-gridSize = (50, 30)
-gridStep = img.shape[0]//gridSize[0], img.shape[1]//gridSize[1]
-grid = [(i, j) for i in range(0, img.shape[0]+1, gridStep[0]) for j in range(0, img.shape[1]+1, gridStep[1])]
+gridSize = 40
+grid = [(i, j) for i in range(0, img.shape[0]+1, gridSize) for j in range(0, img.shape[1]+1, gridSize)]
 grid = np.array(grid)
 
 points = []
