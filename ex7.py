@@ -8,8 +8,9 @@
 
 
 import numpy as np
-from PIL import Image, ImageDraw
 import MyLib as ml
+from copy import deepcopy
+from PIL import Image, ImageDraw
 
 
 def getPoints(img):
@@ -95,7 +96,7 @@ img = np.array(img)
 # Getting object border
 border = ml.conv2D(img, ml.LAPLACE_FILTER)
 
-Image.fromarray(border).show()
+images = [deepcopy(border)]
 
 # Getting border points
 vertices = getPoints(border)
@@ -110,13 +111,22 @@ points = convert2grid(vertices, grid)
 # Finding Freeman chain
 f, p = getFreemanChain(points, gridSize)
 
+print("Grid size: {}".format(gridSize))
+print("Freeman chain size: {}".format(len(f)))
+print("Freeman chain: {}".format(f))
+
+# Making results to show
 result = Image.new('L', (img.shape[1], img.shape[0]))
 border = Image.fromarray(border)
 d = ImageDraw.Draw(border)
 grid = [(j, i) for i, j in grid]
+d.point(grid, fill=255)
+images.append(deepcopy(np.array(border)))
+d = ImageDraw.Draw(result)
+d.point(p, fill=255)
+images.append(deepcopy(np.array(result)))
 d.line(p, fill=255)
-d.point(grid, fill=0)
-print("Grid size: {}".format(gridSize))
-print("Freeman chain size: {}".format(len(f)))
-print("Freeman chain: {}".format(f))
-border.show()
+images.append(deepcopy((np.array(result))))
+
+titles = ['Borda externa', 'Imagem com o grid', 'Fronteira subamostrada', 'Pontos conectados']
+ml.show_images(images, 1, titles)
