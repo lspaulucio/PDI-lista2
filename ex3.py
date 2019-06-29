@@ -3,7 +3,7 @@
 """ Processamento Digital de Imagens
     Aluno: Leonardo Santos Paulucio
     Lista de Exercicios 2 - Pós-Graduação
-    Data: 23/06/19
+    Data: 30/06/19
 """
 
 
