@@ -1,0 +1,15 @@
+""" Processamento Digital de Imagens
+    Aluno: Leonardo Santos Paulucio
+    Lista de Exercicios 1 - Pós-Graduação
+    Data: 30/06/19
+"""
+Versão Python utilizada: Python 3.5.2
+
+As bibliotecas utilizadas estão listadas no arquivo "requirements.txt"
+Para instalação pode se utilizar o seguinte comando:
+pip install -r requirements.txt
+
+Para executar um script basta digitar o seguinte comando:
+
+Ex: Executar o script do exercicio 3
+python ex3.py
